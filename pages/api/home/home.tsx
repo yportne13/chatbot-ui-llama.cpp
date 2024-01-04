@@ -53,7 +53,7 @@ const Home = ({
   defaultModelId,
 }: Props) => {
   const { t } = useTranslation('chat');
-  const { getModels } = useApiService();
+  //const { getModels } = useApiService();
   const { getModelsError } = useErrorService();
   const [initialRender, setInitialRender] = useState<boolean>(true);
 
@@ -76,7 +76,7 @@ const Home = ({
 
   const stopConversationRef = useRef<boolean>(false);
 
-  const { data, error, refetch } = useQuery(
+  /*const { data, error, refetch } = useQuery(
     ['GetModels', apiKey, serverSideApiKeyIsSet],
     ({ signal }) => {
       if (!apiKey && !serverSideApiKeyIsSet) return null;
@@ -89,7 +89,9 @@ const Home = ({
       );
     },
     { enabled: true, refetchOnMount: false },
-  );
+  );*/
+  const data = "";
+  const error = "";
 
   useEffect(() => {
     if (data) dispatch({ field: 'models', value: data });

@@ -1,7 +1,7 @@
 import { Message } from '@/types/chat';
 import { OpenAIModel } from '@/types/openai';
 
-import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION } from '../app/const';
+import { AZURE_DEPLOYMENT_ID, OPENAI_API_HOST, OPENAI_API_TYPE, OPENAI_API_VERSION, OPENAI_ORGANIZATION, SYSPROMPT, PREFIXPROMPT, POSTPROMPT } from '../app/const';
 
 import {
   ParsedEvent,
@@ -23,6 +23,18 @@ export class OpenAIError extends Error {
   }
 }
 
+function concatenatePrompts(sys_prompt: string, prefix_prompt: string, post_prompt: string, messages: Message[]) {
+  let result = sys_prompt;
+  for (let i = 0; i < messages.length; i++) {
+    if (i % 2 === 1) { // Skip even indexed messages
+      result += `${messages[i].content}`;
+    } else {
+      result += `${prefix_prompt}${messages[i].content}${post_prompt}`;
+    }
+  }
+  return result;
+}
+
 export const OpenAIStream = async (
   model: OpenAIModel,
   systemPrompt: string,
@@ -30,34 +42,37 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  //let url = `${OPENAI_API_HOST}/v1/chat/completions`;
+  let url = `${OPENAI_API_HOST}/completion`;
   if (OPENAI_API_TYPE === 'azure') {
     url = `${OPENAI_API_HOST}/openai/deployments/${AZURE_DEPLOYMENT_ID}/chat/completions?api-version=${OPENAI_API_VERSION}`;
   }
+  console.log(messages);
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      ...(OPENAI_API_TYPE === 'openai' && {
-        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
-      }),
-      ...(OPENAI_API_TYPE === 'azure' && {
-        'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
-      }),
-      ...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
-        'OpenAI-Organization': OPENAI_ORGANIZATION,
-      }),
+      //...(OPENAI_API_TYPE === 'openai' && {
+      //  Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`
+      //}),
+      //...(OPENAI_API_TYPE === 'azure' && {
+      //  'api-key': `${key ? key : process.env.OPENAI_API_KEY}`
+      //}),
+      //...((OPENAI_API_TYPE === 'openai' && OPENAI_ORGANIZATION) && {
+      //  'OpenAI-Organization': OPENAI_ORGANIZATION,
+      //}),
     },
     method: 'POST',
     body: JSON.stringify({
-      ...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        ...messages,
-      ],
-      max_tokens: 1000,
+      //...(OPENAI_API_TYPE === 'openai' && {model: model.id}),
+      //messages: [
+      //  {
+      //    role: 'system',
+      //    content: systemPrompt,
+      //  },
+      //  ...messages,
+      //],
+      //max_tokens: 1000,
+      prompt: concatenatePrompts(SYSPROMPT, PREFIXPROMPT, POSTPROMPT, messages),
       temperature: temperature,
       stream: true,
     }),
@@ -92,11 +107,12 @@ export const OpenAIStream = async (
 
           try {
             const json = JSON.parse(data);
-            if (json.choices[0].finish_reason != null) {
+            //if (json.choices[0].finish_reason != null) {
+            if(json.stop) {
               controller.close();
               return;
             }
-            const text = json.choices[0].delta.content;
+            const text = json.content;//choices[0].delta.content;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
