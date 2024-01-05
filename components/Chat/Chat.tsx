@@ -38,6 +38,22 @@ interface Props {
   stopConversationRef: MutableRefObject<boolean>;
 }
 
+function concatenatePrompts(sys_prompt: string, prefix_prompt: string, post_prompt: string, messages: Message[]) {
+  let result = sys_prompt;
+  for (let i = 0; i < messages.length; i++) {
+    if (i % 2 === 1) { // Skip even indexed messages
+      result += `${messages[i].content}`;
+    } else {
+      result += `${prefix_prompt}${messages[i].content}${post_prompt}`;
+    }
+  }
+  return result;
+}
+
+const SYSPROMPT = "<s>";
+const PREFIXPROMPT = "[INST]";
+const POSTPROMPT = " [/INST]\n";
+
 export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
 
@@ -100,7 +116,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           prompt: updatedConversation.prompt,
           temperature: updatedConversation.temperature,
         };
-        const endpoint = getEndpoint(plugin);
+        //const endpoint = getEndpoint(plugin);
         let body;
         if (!plugin) {
           body = JSON.stringify(chatBody);
@@ -116,13 +132,17 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           });
         }
         const controller = new AbortController();
-        const response = await fetch(endpoint, {
-          method: 'POST',
+        console.log(updatedConversation.messages);
+        const response = await fetch("/completion", {
           headers: {
             'Content-Type': 'application/json',
           },
-          signal: controller.signal,
-          body,
+          method: 'POST',
+          body: JSON.stringify({
+            prompt: concatenatePrompts(SYSPROMPT, PREFIXPROMPT, POSTPROMPT, updatedConversation.messages),
+            temperature: 0.5,//updatedConversation.temperature,
+            stream: true,
+          }),
         });
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
@@ -160,7 +180,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             }
             const { value, done: doneReading } = await reader.read();
             done = doneReading;
-            const chunkValue = decoder.decode(value);
+            const chunkValue1 = decoder.decode(value);
+            const json = JSON.parse(chunkValue1.slice(6));
+            const chunkValue = json.content
+            done = json.stop;
             text += chunkValue;
             if (isFirst) {
               isFirst = false;
