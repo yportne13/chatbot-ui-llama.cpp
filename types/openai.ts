@@ -1,45 +1,54 @@
 import { OPENAI_API_TYPE } from '../utils/app/const';
 
 export interface OpenAIModel {
+  url: string;
   id: string;
   name: string;
   maxLength: number; // maximum length of a message
   tokenLimit: number;
+  sysPrompt: string;
+  prefixPrompt: string;
+  suffixPrompt: string;
 }
 
 export enum OpenAIModelID {
-  GPT_3_5 = 'gpt-3.5-turbo',
-  GPT_3_5_AZ = 'gpt-35-turbo',
-  GPT_4 = 'gpt-4',
-  GPT_4_32K = 'gpt-4-32k',
+  Mistral = 'Mistral-Instruct',
+  OpenChat = 'OpenChat-3.5-1210',
+  DeepSeek = 'DeepSeek-coder-6.7B',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
-export const fallbackModelID = OpenAIModelID.GPT_3_5;
+export const fallbackModelID = OpenAIModelID.Mistral;
 
 export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
-  [OpenAIModelID.GPT_3_5]: {
-    id: OpenAIModelID.GPT_3_5,
-    name: 'GPT-3.5',
-    maxLength: 12000,
-    tokenLimit: 4000,
+  [OpenAIModelID.Mistral]: {
+    url: '/completion',// if you have more than one server, you can config this like 'http://127.0.0.1:2992/completion'
+    id: OpenAIModelID.Mistral,
+    name: 'Mistral-Instruct',
+    sysPrompt: '<s>',
+    prefixPrompt: '[INST]',
+    suffixPrompt: ' [/INST]',
+    maxLength: 10000000,
+    tokenLimit: 10000000,
   },
-  [OpenAIModelID.GPT_3_5_AZ]: {
-    id: OpenAIModelID.GPT_3_5_AZ,
-    name: 'GPT-3.5',
-    maxLength: 12000,
-    tokenLimit: 4000,
+  [OpenAIModelID.OpenChat]: {
+    url: '/completion',// if you have more than one server, you can config this like 'http://127.0.0.1:2992/completion'
+    id: OpenAIModelID.OpenChat,
+    name: 'OpenChat-3.5-1210',
+    sysPrompt: '',
+    prefixPrompt: 'GPT4 Correct User: ',
+    suffixPrompt: '<|end_of_turn|>GPT4 Correct Assistant: ',
+    maxLength: 10000000,
+    tokenLimit: 10000000,
   },
-  [OpenAIModelID.GPT_4]: {
-    id: OpenAIModelID.GPT_4,
-    name: 'GPT-4',
-    maxLength: 24000,
-    tokenLimit: 8000,
-  },
-  [OpenAIModelID.GPT_4_32K]: {
-    id: OpenAIModelID.GPT_4_32K,
-    name: 'GPT-4-32K',
-    maxLength: 96000,
-    tokenLimit: 32000,
+  [OpenAIModelID.DeepSeek]: {
+    url: '/completion',
+    id: OpenAIModelID.DeepSeek,
+    name: 'DeepSeek-coder-6.7B',
+    sysPrompt: 'You are an AI programming assistant, utilizing the Deepseek Coder model, developed by Deepseek Company, and you only answer questions related to computer science. For politically sensitive questions, security and privacy issues, and other non-computer science questions, you will refuse to answer.\n',
+    prefixPrompt: '### Instruction:\n',
+    suffixPrompt: '\n### Response:\n',
+    maxLength: 10000000,
+    tokenLimit: 10000000,
   },
 };

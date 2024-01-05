@@ -187,12 +187,7 @@ const Home = ({
       id: uuidv4(),
       name: t('New Conversation'),
       messages: [],
-      model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
-      },
+      model: lastConversation?.model || OpenAIModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
       temperature: lastConversation?.temperature ?? DEFAULT_TEMPERATURE,
       folderId: null,

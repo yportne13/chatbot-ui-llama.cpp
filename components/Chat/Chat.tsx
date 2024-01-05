@@ -41,7 +41,8 @@ interface Props {
 function concatenatePrompts(sys_prompt: string, prefix_prompt: string, post_prompt: string, messages: Message[]) {
   let result = sys_prompt;
   for (let i = 0; i < messages.length; i++) {
-    if (i % 2 === 1) { // Skip even indexed messages
+    //if (i % 2 === 1) { // Skip even indexed messages
+    if (messages[i].role === 'assistant') {
       result += `${messages[i].content}`;
     } else {
       result += `${prefix_prompt}${messages[i].content}${post_prompt}`;
@@ -49,10 +50,6 @@ function concatenatePrompts(sys_prompt: string, prefix_prompt: string, post_prom
   }
   return result;
 }
-
-const SYSPROMPT = "<s>";
-const PREFIXPROMPT = "[INST]";
-const POSTPROMPT = " [/INST]\n";
 
 export const Chat = memo(({ stopConversationRef }: Props) => {
   const { t } = useTranslation('chat');
@@ -133,14 +130,23 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         }
         const controller = new AbortController();
         console.log(updatedConversation.messages);
-        const response = await fetch("/completion", {
+        const this_model = updatedConversation.model;
+        console.log(this_model);
+        console.log(this_model.url);
+        console.log(updatedConversation.temperature);
+        const response = await fetch(this_model.url, {
           headers: {
             'Content-Type': 'application/json',
           },
           method: 'POST',
           body: JSON.stringify({
-            prompt: concatenatePrompts(SYSPROMPT, PREFIXPROMPT, POSTPROMPT, updatedConversation.messages),
-            temperature: 0.5,//updatedConversation.temperature,
+            prompt: concatenatePrompts(
+              this_model.sysPrompt,
+              this_model.prefixPrompt,
+              this_model.suffixPrompt,
+              updatedConversation.messages
+            ),
+            temperature: updatedConversation.temperature,
             stream: true,
           }),
         });

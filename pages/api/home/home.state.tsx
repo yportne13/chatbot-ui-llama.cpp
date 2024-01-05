@@ -1,7 +1,7 @@
 import { Conversation, Message } from '@/types/chat';
 import { ErrorMessage } from '@/types/error';
 import { FolderInterface } from '@/types/folder';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
+import { OpenAIModel, OpenAIModelID, OpenAIModels } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
 
@@ -29,6 +29,9 @@ export interface HomeInitialState {
   serverSidePluginKeysSet: boolean;
 }
 
+// First, convert keys to an array using Object.keys()
+const keys = Object.values(OpenAIModelID);
+
 export const initialState: HomeInitialState = {
   apiKey: '',
   loading: false,
@@ -36,7 +39,7 @@ export const initialState: HomeInitialState = {
   lightMode: 'dark',
   messageIsStreaming: false,
   modelError: null,
-  models: [],
+  models: keys.map((key) => OpenAIModels[key]),
   folders: [],
   conversations: [],
   selectedConversation: undefined,
@@ -49,6 +52,6 @@ export const initialState: HomeInitialState = {
   messageError: false,
   searchTerm: '',
   defaultModelId: undefined,
-  serverSideApiKeyIsSet: false,
-  serverSidePluginKeysSet: false,
+  serverSideApiKeyIsSet: true,
+  serverSidePluginKeysSet: true,
 };
