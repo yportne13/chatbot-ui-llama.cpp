@@ -1,5 +1,40 @@
 # Chatbot UI
 
+## Chatbot UI for llama.cpp server
+
+### How to use
+
+clone this repository, and then:
+
+```
+npm install
+npm run build
+```
+
+and you will get a `out/` dir.
+
+if you are windows user, go to https://github.com/ggerganov/llama.cpp/releases to download a server.
+
+```
+ .\server.exe --model /PATH_TO_MODEL --path THE_OUT_DIR_YOU_JUST_BUILD
+```
+
+else if you are not windows user, go to https://github.com/ggerganov/llama.cpp, clone, and make.
+
+```
+ ./server --model /PATH_TO_MODEL --path THE_OUT_DIR_YOU_JUST_BUILD
+```
+
+and go to your browser: http://localhost:8080
+
+### Config
+
+change the language: in next-i18next.config.js, change defaultLocale
+
+add more model: types/openai.ts
+
+## below are the origin chatbot-ui readme
+
 ## News
 
 Chatbot UI 2.0 will launch on Monday January 8th, 2024.
