@@ -55,7 +55,9 @@ jobs:
         run: npm run build
 
       - name: Zip
-        run: zip -r out.zip out/
+        run: |
+          sudo apt install zip
+          zip -r out.zip out/
 
       - name: upload
         uses: actions/upload-artifact@v2
