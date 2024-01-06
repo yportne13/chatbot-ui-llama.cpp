@@ -55,7 +55,7 @@ jobs:
         run: npm run build
 
       - name: Zip
-        run: zip out/
+        run: zip -r out.zip out/
 
       - name: upload
         uses: actions/upload-artifact@v2
