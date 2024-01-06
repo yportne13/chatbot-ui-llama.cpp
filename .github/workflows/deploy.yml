@@ -54,16 +54,11 @@ jobs:
       - name: Run Build
         run: npm run build
 
-      - name: Zip
-        run: |
-          sudo apt install zip
-          zip -r out.zip out/
-
       - name: upload
         uses: actions/upload-artifact@v2
         with:
           name: next-build
-          path: out.zip
+          path: out/
 
       - name: Upload release assets windows
         uses: actions/upload-release-asset@v1
@@ -71,4 +66,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_name: out.zip
+          asset_name: out/
