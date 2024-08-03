@@ -76,6 +76,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      generationSpeed,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -116,6 +117,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
+        homeDispatch({ field: 'generationSpeed', value: 0.0 });
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
@@ -239,6 +241,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 field: 'selectedConversation',
                 value: updatedConversation,
               });
+            }
+            if (done) {
+              const predictedPerSecond = json.timings?.predicted_per_second;
+              homeDispatch({ field: 'generationSpeed', value: predictedPerSecond});
             }
           }
           saveConversation(updatedConversation);
