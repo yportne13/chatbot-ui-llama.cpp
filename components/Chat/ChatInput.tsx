@@ -407,7 +407,10 @@ export const ChatInput = ({
           LLaMA CPP server
         </a>
         {'. '}
-        {generationSpeed !== 0.0 && `(Last generation speed: ${generationSpeed.toFixed(2)} tokens/s)`}
+        {
+          generationSpeed !== 0.0 && typeof generationSpeed === 'number' &&
+          `(Last generation speed: ${generationSpeed.toFixed(2)} tokens/s)`
+        }
       </div>
     </div>
   );

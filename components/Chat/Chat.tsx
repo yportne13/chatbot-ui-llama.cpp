@@ -243,7 +243,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
               });
             }
             if (done) {
-              const predictedPerSecond = json.timings?.predicted_per_second;
+              const predictedPerSecond = json.timings?.predicted_per_second || 0.0;
               homeDispatch({ field: 'generationSpeed', value: predictedPerSecond});
             }
           }
