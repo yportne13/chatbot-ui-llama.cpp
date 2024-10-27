@@ -21,10 +21,12 @@ export enum OpenAIModelID {
   Solar = 'Solar',
   NousHermes = 'Nous-Hermes',
   Zephyr = 'Zephyr',
+  LLaMA = 'LLaMA-3.1',
+  Gemma = 'Gemma',
 }
 
 // in case the `DEFAULT_MODEL` environment variable is not set or set to an unsupported model
-export const fallbackModelID = OpenAIModelID.Mistral;
+export const fallbackModelID = OpenAIModelID.LLaMA;
 
 export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
   [OpenAIModelID.Mistral]: {
@@ -114,6 +116,26 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     sysPrompt: '<|system|>\nYou are a friendly chatbot who always responds in the style of a pirate.</s>',
     prefixPrompt: '<|user|>\n',
     suffixPrompt: '</s>\n<|assistant|>\n',
+    maxLength: 10000000,
+    tokenLimit: 10000000,
+  },
+  [OpenAIModelID.LLaMA]: {
+    url: '/completion',
+    id: OpenAIModelID.LLaMA,
+    name: 'LLaMA-3.1',
+    sysPrompt: '<|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2023\nToday Date: [@today_date]\n\nYou are a helpful assistant<|eot_id|>',
+    prefixPrompt: '<|start_header_id|>user<|end_header_id|>\n\n',
+    suffixPrompt: '<|eot_id|><|start_header_id|>assistant<|end_header_id|>',
+    maxLength: 10000000,
+    tokenLimit: 10000000,
+  },
+  [OpenAIModelID.Gemma]: {
+    url: '/completion',
+    id: OpenAIModelID.Gemma,
+    name: 'Gemma',
+    sysPrompt: '<start_of_turn>user\nCutting Knowledge Date: December 2023\nToday Date: [@today_date]\n\nYou are a helpful assistant<end_of_turn>\n',
+    prefixPrompt: '<start_of_turn>user\n',
+    suffixPrompt: '<end_of_turn>\n<start_of_turn>model\n',
     maxLength: 10000000,
     tokenLimit: 10000000,
   },

@@ -48,7 +48,7 @@ export const ChatInput = ({
   const { t } = useTranslation('chat');
 
   const {
-    state: { selectedConversation, messageIsStreaming, prompts },
+    state: { selectedConversation, messageIsStreaming, prompts, generationSpeed },
 
     dispatch: homeDispatch,
   } = useContext(HomeContext);
@@ -381,6 +381,15 @@ export const ChatInput = ({
       </div>
       <div className="px-3 pt-2 pb-3 text-center text-[12px] text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
         <a
+          href="https://github.com/yportne13/chatbot-ui-llama.cpp"
+          target="_blank"
+          rel="noreferrer"
+          className="underline"
+        >
+          Port
+        </a>
+        {' of '}
+        <a
           href="https://github.com/mckaywrigley/chatbot-ui"
           target="_blank"
           rel="noreferrer"
@@ -388,10 +397,20 @@ export const ChatInput = ({
         >
           ChatBot UI
         </a>
-        .{' '}
-        {t(
-          "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.",
-        )}
+        {' for '}
+        <a
+          href="https://github.com/ggerganov/llama.cpp/tree/master/examples/server"
+          target="_blank"
+          rel="noreferrer"
+          className="underline"
+        >
+          LLaMA CPP server
+        </a>
+        {'. '}
+        {
+          generationSpeed !== 0.0 && typeof generationSpeed === 'number' &&
+          `(Last generation speed: ${generationSpeed.toFixed(2)} tokens/s)`
+        }
       </div>
     </div>
   );

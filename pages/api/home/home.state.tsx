@@ -11,6 +11,7 @@ export interface HomeInitialState {
   loading: boolean;
   lightMode: 'light' | 'dark';
   messageIsStreaming: boolean;
+  generationSpeed: number;
   modelError: ErrorMessage | null;
   models: OpenAIModel[];
   folders: FolderInterface[];
@@ -38,6 +39,7 @@ export const initialState: HomeInitialState = {
   pluginKeys: [],
   lightMode: 'dark',
   messageIsStreaming: false,
+  generationSpeed: 0.0,
   modelError: null,
   models: keys.map((key) => OpenAIModels[key]),
   folders: [],

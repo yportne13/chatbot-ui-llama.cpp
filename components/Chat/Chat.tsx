@@ -39,6 +39,16 @@ interface Props {
 }
 
 function concatenatePrompts(sys_prompt: string, prefix_prompt: string, post_prompt: string, messages: Message[]) {
+  if (sys_prompt.includes('[@today_date]')) {
+    const currentDate = new Date();
+    const dayOfWeek = currentDate.toLocaleString('en-US', { weekday: 'long' });
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
+    const hours = currentDate.getHours().toString().padStart(2, '0');
+    const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+    const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}:${seconds}`;
+    sys_prompt = sys_prompt.replace('[@today_date]', `${dayOfWeek} ${formattedDate} ${formattedTime}`);
+  }
   let result = sys_prompt;
   for (let i = 0; i < messages.length; i++) {
     //if (i % 2 === 1) { // Skip even indexed messages
@@ -66,6 +76,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       modelError,
       loading,
       prompts,
+      generationSpeed,
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -106,6 +117,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
+        homeDispatch({ field: 'generationSpeed', value: 0.0 });
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
@@ -229,6 +241,10 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                 field: 'selectedConversation',
                 value: updatedConversation,
               });
+            }
+            if (done) {
+              const predictedPerSecond = json.timings?.predicted_per_second || 0.0;
+              homeDispatch({ field: 'generationSpeed', value: predictedPerSecond});
             }
           }
           saveConversation(updatedConversation);
